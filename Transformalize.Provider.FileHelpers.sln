@@ -9,6 +9,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transformalize.Provider.Fil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integration.Tests", "src\Integration.Tests\Integration.Tests.csproj", "{6B00D839-B26A-481A-AAF0-1D03A2B90EEC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{CB2C5EFE-3F36-43E8-A7AB-D2EBC9356389}"
+	ProjectSection(SolutionItems) = preProject
+		nuget\nuget.bat = nuget\nuget.bat
+		nuget\nuget.exe = nuget\nuget.exe
+		nuget\Transformalize.Provider.FileHelpers.Autofac.nuspec = nuget\Transformalize.Provider.FileHelpers.Autofac.nuspec
+		nuget\Transformalize.Provider.FileHelpers.nuspec = nuget\Transformalize.Provider.FileHelpers.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

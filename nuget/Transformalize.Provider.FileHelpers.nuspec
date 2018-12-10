@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <id>Transformalize.Provider.FileHelpers</id>
+    <version>0.3.12-beta</version>
+    <title>File Provider for Transformalize</title>
+    <authors>Dale Newman</authors>
+    <owners>Dale Newman</owners>
+    <licenseUrl>https://github.com/dalenewman/Transformalize/blob/master/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/dalenewman/Transformalize</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>File Provider for Transformalize</description>
+    <releaseNotes>moved to plugin</releaseNotes>
+    <copyright>Copyright 2013-2018</copyright>
+    <tags>etl</tags>
+    <dependencies>
+      <group targetFramework="net462">
+        <dependency id="FileHelpers" version="3.1.5" />
+        <dependency id="Transformalize" version="0.3.12-beta" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\src\Transformalize.Provider.FileHelpers\bin\Release\Transformalize.Provider.FileHelpers.dll" target="lib\net462\Transformalize.Provider.FileHelpers.dll" />
+  </files>
+</package>
