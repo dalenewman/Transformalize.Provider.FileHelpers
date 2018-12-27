@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Transformalize.Provider.FileHelpers</id>
-    <version>0.3.12-beta</version>
+    <version>0.3.13-beta</version>
     <title>File Provider for Transformalize</title>
     <authors>Dale Newman</authors>
     <owners>Dale Newman</owners>
@@ -10,7 +10,7 @@
     <projectUrl>https://github.com/dalenewman/Transformalize</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>File Provider for Transformalize</description>
-    <releaseNotes>moved to plugin</releaseNotes>
+    <releaseNotes>create output folder structure if necessary</releaseNotes>
     <copyright>Copyright 2013-2018</copyright>
     <tags>etl</tags>
     <dependencies>

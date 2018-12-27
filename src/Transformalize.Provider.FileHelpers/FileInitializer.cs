@@ -15,8 +15,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-#region license
-#endregion
 
 using System;
 using System.IO;
@@ -38,11 +36,12 @@ namespace Transformalize.Providers.FileHelpers {
 
             _context.Warn("Initializing");
 
-            var fileInfo = new FileInfo(_context.Connection.File);
+            var fileInfo = new FileInfo(Path.Combine(_context.Connection.Folder, _context.Connection.File ?? _context.Entity.OutputTableName(_context.Process.Name)));
 
-            if (fileInfo.Directory != null && !fileInfo.Directory.Exists) {
+            var folder = Path.GetDirectoryName(fileInfo.FullName);
+            if (folder != null && !Directory.Exists(folder)) {
                 try {
-                    fileInfo.Directory.Create();
+                    Directory.CreateDirectory(folder);
                 } catch (UnauthorizedAccessException ex) {
                     _context.Warn("Unable to create folder {0}", ex.Message);
                 }

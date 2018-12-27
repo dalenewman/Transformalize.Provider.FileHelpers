@@ -17,6 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -44,12 +45,22 @@ namespace Transformalize.Providers.FileHelpers {
             }
         }
 
+        public static IEnumerable<string> ReadLines(string path, Encoding encoding) {
+            using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 0x1000, FileOptions.SequentialScan))
+            using (var sr = new StreamReader(fs, encoding)) {
+                string line;
+                while ((line = sr.ReadLine()) != null) {
+                    yield return line;
+                }
+            }
+        }
+
         public IEnumerable<IRow> Read() {
             var encoding = Encoding.GetEncoding(_context.Connection.Encoding);
             var lineNo = 0;
-            if (System.IO.Path.GetExtension(_context.Connection.File) == ".xml") {
+            if (Path.GetExtension(_context.Connection.File) == ".xml") {
                 var row = _rowFactory.Create();
-                row[_field] = System.IO.File.ReadAllText(_context.Connection.File, encoding);
+                row[_field] = File.ReadAllText(_context.Connection.File, encoding);
                 yield return row;
             } else {
                 if (_context.Connection.LinePattern != string.Empty) {
@@ -57,7 +68,7 @@ namespace Transformalize.Providers.FileHelpers {
                     var regex = new Regex(_context.Connection.LinePattern, RegexOptions.Compiled);
                     var prevLine = string.Empty;
 
-                    foreach (var line in System.IO.File.ReadLines(_context.Connection.File, encoding)) {
+                    foreach (var line in ReadLines(_context.Connection.File, encoding)) {
                         ++lineNo;
 
                         if (_linesToKeep.Contains(lineNo)) {

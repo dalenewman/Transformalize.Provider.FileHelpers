@@ -96,7 +96,10 @@ namespace Transformalize.Provider.FileHelpers.Autofac {
                     // ENTITY OUTPUT CONTROLLER
                     builder.Register<IOutputController>(ctx => {
                         var output = ctx.ResolveNamed<OutputContext>(entity.Key);
-                        var initializer = p.Mode == "init" ? (IInitializer)new FileInitializer(output) : new NullInitializer();
+                        var fileInfo = new FileInfo(Path.Combine(output.Connection.Folder, output.Connection.File ?? output.Entity.OutputTableName(output.Process.Name)));
+                        var folder = Path.GetDirectoryName(fileInfo.FullName);
+                        var init = p.Mode == "init" || (folder != null && !Directory.Exists(folder));
+                        var initializer = init ? (IInitializer)new FileInitializer(output) : new NullInitializer();
                         return new FileOutputController(output, initializer, new NullInputProvider(), new NullOutputProvider());
                     }).Named<IOutputController>(entity.Key);
 
@@ -119,13 +122,10 @@ namespace Transformalize.Provider.FileHelpers.Autofac {
                 }
             }
 
-
             // FOLDERS
-
             foreach (var connection in p.Connections.Where(c => c.Provider == "folder")) {
                 builder.Register<ISchemaReader>(ctx => new NullSchemaReader()).Named<ISchemaReader>(connection.Key);
             }
-
             
             // enitity input
             foreach (var entity in p.Entities.Where(e => p.Connections.First(c => c.Name == e.Connection).Provider == "folder")) {

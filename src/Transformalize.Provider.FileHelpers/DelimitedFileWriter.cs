@@ -36,16 +36,17 @@ namespace Transformalize.Providers.FileHelpers {
         public void Write(IEnumerable<IRow> rows) {
 
             var engine = FileHelpersEngineFactory.Create(_context);
-            var file = Path.Combine(_context.Connection.Folder, _context.Connection.File ?? _context.Entity.OutputTableName(_context.Process.Name));
+            var fileInfo = new FileInfo(Path.Combine(_context.Connection.Folder, _context.Connection.File ?? _context.Entity.OutputTableName(_context.Process.Name)));
             var fields = _context.Entity.GetAllOutputFields().Where(f => !f.System).ToArray();
-            _context.Info($"Writing {file}.");
 
-            using (engine.BeginWriteFile(file)) {
+            _context.Info($"Writing {fileInfo.FullName}.");
+
+            using (engine.BeginWriteFile(fileInfo.FullName)) {
                 foreach (var row in rows) {
 
                     var i = 0;
                     foreach (var field in fields) {
-                        
+
                         switch (field.Type) {
                             case "byte[]":
                                 engine[i] = Convert.ToBase64String((byte[])row[field]);
