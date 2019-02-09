@@ -46,6 +46,70 @@ namespace Integration.Tests {
         }
 
         [TestMethod]
+        public void WriteWithSomeLineBreaks() {
+            const string xml = @"<add name='file' mode='init'>
+  <connections>
+    <add name='input' provider='internal' />
+    <add name='output' provider='file' delimiter=',' file='c:\temp\data-with-line-breaks-and-commas.csv' text-qualifier='""' />
+  </connections>
+  <entities>
+    <add name='Contact'>
+      <rows>
+        <add Identity='1' FirstName='Dale' LastName='Newman' Stars='1' Reviewers='1' />
+        <add Identity='2' FirstName='Dale
+ Jr' LastName='Newman,s' Stars='2' Reviewers='2' />
+      </rows>
+      <fields>
+        <add name='Identity' type='int' />
+        <add name='FirstName' />
+        <add name='LastName' />
+        <add name='Stars' type='byte' />
+        <add name='Reviewers' type='int' />
+      </fields>
+    </add>
+  </entities>
+</add>";
+            using (var outer = new ConfigurationContainer().CreateScope(xml)) {
+                using (var inner = new TestContainer(new BogusModule(), new FileHelpersModule()).CreateScope(outer, new ConsoleLogger(LogLevel.Debug))) {
+                    //var process = inner.Resolve<Process>();
+                    var controller = inner.Resolve<IProcessController>();
+                    controller.Execute();
+                    
+                }
+            }
+        }
+
+        [TestMethod]
+        public void ReadWithSomeLineBreaks() {
+            const string xml = @"<add name='file' mode='init'>
+  <connections>
+    <add name='input' provider='file' delimiter=',' file='c:\temp\data-with-line-breaks-and-commas.csv' text-qualifier='""' />
+    <add name='output' provider='internal' />  
+  </connections>
+  <entities>
+    <add name='Contact'>
+      <fields>
+        <add name='Identity' type='int' />
+        <add name='FirstName' />
+        <add name='LastName' />
+        <add name='Stars' type='byte' />
+        <add name='Reviewers' type='int' />
+      </fields>
+    </add>
+  </entities>
+</add>";
+            using (var outer = new ConfigurationContainer().CreateScope(xml)) {
+                using (var inner = new TestContainer(new BogusModule(), new FileHelpersModule()).CreateScope(outer, new ConsoleLogger(LogLevel.Debug))) {
+                    var process = inner.Resolve<Process>();
+                    var controller = inner.Resolve<IProcessController>();
+                    controller.Execute();
+                    Assert.AreEqual(2, process.Entities.First().Rows.Count);
+
+                }
+            }
+        }
+
+        [TestMethod]
         public void Read() {
             const string xml = @"<add name='file'>
   <connections>

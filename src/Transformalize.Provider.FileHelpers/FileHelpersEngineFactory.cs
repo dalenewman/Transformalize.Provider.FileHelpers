@@ -48,6 +48,7 @@ namespace Transformalize.Providers.FileHelpers {
                     var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
                     fieldBuilder.FieldQuoted = true;
                     fieldBuilder.QuoteChar = context.Connection.TextQualifier[0];
+                    fieldBuilder.QuoteMultiline = MultilineMode.AllowForBoth;
                     fieldBuilder.QuoteMode = QuoteMode.OptionalForBoth;
                     fieldBuilder.FieldOptional = field.Optional;
                 }

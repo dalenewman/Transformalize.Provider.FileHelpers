@@ -41,7 +41,7 @@ namespace Transformalize.Provider.FileHelpers.Autofac {
             input.Info($"Found {files.Length} files.");
             foreach (var file in files) {
                 input.Info($"Found file: {file.Name}");
-
+                input.Connection.File = file.FullName;
                 var context = new PipelineContext(input.Logger, input.Process, input.Entity, input.Field, input.Operation);
 
                 var fileConnection = input.Connection.Clone();
