@@ -41,6 +41,7 @@ namespace Transformalize.Providers.FileHelpers {
                 foreach (var field in fields) {
                     var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
                     fieldBuilder.FieldQuoted = false;
+                    fieldBuilder.QuoteMultiline = MultilineMode.NotAllow;
                     fieldBuilder.FieldOptional = field.Optional;
                 }
             } else {
