@@ -2,20 +2,20 @@
 <package>
   <metadata>
     <id>Transformalize.Provider.FileHelpers</id>
-    <version>0.3.25-beta</version>
+    <version>0.3.26-beta</version>
     <title>File Provider for Transformalize</title>
     <authors>Dale Newman</authors>
     <owners>Dale Newman</owners>
     <projectUrl>https://github.com/dalenewman/Transformalize</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>File Provider for Transformalize</description>
-    <releaseNotes>courtesy flushing</releaseNotes>
+    <releaseNotes>removed courtesy flushing</releaseNotes>
     <copyright>Copyright 2013-2019</copyright>
     <tags>etl</tags>
     <dependencies>
       <group targetFramework="net462">
         <dependency id="FileHelpers" version="3.3.0" />
-        <dependency id="Transformalize" version="0.3.25-beta" />
+        <dependency id="Transformalize" version="0.3.26-beta" />
       </group>
     </dependencies>
   </metadata>
