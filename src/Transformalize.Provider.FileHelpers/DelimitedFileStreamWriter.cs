@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using Transformalize.Context;
 using Transformalize.Contracts;
+using Transformalize.Extensions;
 
 namespace Transformalize.Providers.FileHelpers {
     public class DelimitedFileStreamWriter : IWrite {
@@ -41,53 +42,59 @@ namespace Transformalize.Providers.FileHelpers {
             var writer = new StreamWriter(_stream);
 
             using (engine.BeginWriteStream(writer)) {
-                foreach (var row in rows) {
-                    for (var i = 0; i < _context.OutputFields.Length; i++) {
-                        var field = _context.OutputFields[i];
-                        switch (field.Type) {
-                            case "byte[]":
-                                engine[i] = Convert.ToBase64String((byte[])row[field]);
-                                break;
-                            case "string":
-                                engine[i] = row[field] is string ? row[field] : row[field].ToString();
-                                break;
-                            case "datetime":
-                                var format = field.Format == string.Empty ? "o" : field.Format.Replace("AM/PM", "tt");
-                                engine[i] = row[field] is DateTime ? ((DateTime)row[field]).ToString(format) : Convert.ToDateTime(row[field]).ToString(format);
-                                break;
-                            case "float":
-                            case "decimal":
-                            case "single":
-                            case "double":
-                                if (field.Format == string.Empty) {
-                                    engine[i] = row[field].ToString();
-                                } else {
-                                    switch (field.Type) {
-                                        case "single":
-                                        case "float":
-                                            engine[i] = row[field] is float ? ((float)row[field]).ToString(field.Format) : Convert.ToSingle(row[field]).ToString(field.Format);
-                                            break;
-                                        case "decimal":
-                                            engine[i] = row[field] is decimal ? ((decimal)row[field]).ToString(field.Format) : Convert.ToDecimal(row[field]).ToString(field.Format);
-                                            break;
-                                        case "double":
-                                            engine[i] = row[field] is double ? ((double)row[field]).ToString(field.Format) : Convert.ToDouble(row[field]).ToString(field.Format);
-                                            break;
-                                        default:
-                                            engine[i] = row[field].ToString();
-                                            break;
-                                    }
-                                }
-                                break;
-                            default:
-                                engine[i] = row[field].ToString();
-                                break;
-                        }
-                    }
-                    engine.WriteNextValues();
-                }
-            }
 
+                foreach (var partition in rows.Partition(_context.Entity.InsertSize)) {
+
+                    foreach (var row in partition) {
+
+                        for (var i = 0; i < _context.OutputFields.Length; i++) {
+                            var field = _context.OutputFields[i];
+                            switch (field.Type) {
+                                case "byte[]":
+                                    engine[i] = Convert.ToBase64String((byte[])row[field]);
+                                    break;
+                                case "string":
+                                    engine[i] = row[field] is string ? row[field] : row[field].ToString();
+                                    break;
+                                case "datetime":
+                                    var format = field.Format == string.Empty ? "o" : field.Format.Replace("AM/PM", "tt");
+                                    engine[i] = row[field] is DateTime ? ((DateTime)row[field]).ToString(format) : Convert.ToDateTime(row[field]).ToString(format);
+                                    break;
+                                case "float":
+                                case "decimal":
+                                case "single":
+                                case "double":
+                                    if (field.Format == string.Empty) {
+                                        engine[i] = row[field].ToString();
+                                    } else {
+                                        switch (field.Type) {
+                                            case "single":
+                                            case "float":
+                                                engine[i] = row[field] is float ? ((float)row[field]).ToString(field.Format) : Convert.ToSingle(row[field]).ToString(field.Format);
+                                                break;
+                                            case "decimal":
+                                                engine[i] = row[field] is decimal ? ((decimal)row[field]).ToString(field.Format) : Convert.ToDecimal(row[field]).ToString(field.Format);
+                                                break;
+                                            case "double":
+                                                engine[i] = row[field] is double ? ((double)row[field]).ToString(field.Format) : Convert.ToDouble(row[field]).ToString(field.Format);
+                                                break;
+                                            default:
+                                                engine[i] = row[field].ToString();
+                                                break;
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    engine[i] = row[field].ToString();
+                                    break;
+                            }
+                        }
+                        engine.WriteNextValues();
+                    }
+                    engine.Flush();
+                }
+                engine.Flush();
+            }
         }
     }
 }
