@@ -73,6 +73,9 @@
 
 if exist %25f%25 copy /Y "FileHelpers.dll" "%25f%25"
 if exist %25f%25 copy /Y "Transformalize.Provider.FileHelpers.dll" "%25f%25"
-if exist %25f%25 copy /Y "Transformalize.Provider.FileHelpers.Autofac.dll" "%25f%25"</PostBuildEvent>
+if exist %25f%25 copy /Y "Transformalize.Provider.FileHelpers.pdb" "%25f%25"
+if exist %25f%25 copy /Y "Transformalize.Provider.FileHelpers.Autofac.dll" "%25f%25"
+if exist %25f%25 copy /Y "Transformalize.Provider.FileHelpers.Autofac.pdb" "%25f%25"
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

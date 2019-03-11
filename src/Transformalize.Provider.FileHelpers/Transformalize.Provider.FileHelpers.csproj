@@ -62,6 +62,7 @@
     <Compile Include="FileOutputController.cs" />
     <Compile Include="FileReader.cs" />
     <Compile Include="FileStreamWriter.cs" />
+    <Compile Include="FileUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

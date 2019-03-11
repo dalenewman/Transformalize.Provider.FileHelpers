@@ -2,20 +2,20 @@
 <package>
   <metadata>
     <id>Transformalize.Provider.FileHelpers.Autofac</id>
-    <version>0.3.26-beta</version>
+    <version>0.3.31-beta</version>
     <title>File Provider for Transformalize Autofac Module</title>
     <authors>Dale Newman</authors>
     <owners>Dale Newman</owners>
     <projectUrl>https://github.com/dalenewman/Transformalize</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>File Provider for Transformalize Autofac Module</description>
-    <releaseNotes>removed courtesy flushing</releaseNotes>
+    <releaseNotes>find relative files</releaseNotes>
     <copyright>Copyright 2013-2019</copyright>
     <tags>etl</tags>
     <dependencies>
       <group targetFramework="net462">
         <dependency id="Autofac" version="4.6.2" />
-        <dependency id="Transformalize.Provider.FileHelpers" version="0.3.26-beta" />
+        <dependency id="Transformalize.Provider.FileHelpers" version="0.3.31-beta" />
       </group>
     </dependencies>
   </metadata>

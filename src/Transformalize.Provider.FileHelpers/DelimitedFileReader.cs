@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Transformalize.Configuration;
 using Transformalize.Context;
 using Transformalize.Contracts;
 using Transformalize.Extensions;
@@ -35,7 +34,7 @@ namespace Transformalize.Providers.FileHelpers {
         public DelimitedFileReader(InputContext context, IRowFactory rowFactory) {
             _context = context;
             _rowFactory = rowFactory;
-            _fileInfo = new FileInfo(_context.Connection.File);
+            _fileInfo = FileUtility.Find(_context.Connection.File);
         }
 
         public IEnumerable<IRow> Read() {

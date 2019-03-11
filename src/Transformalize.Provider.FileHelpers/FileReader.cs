@@ -33,8 +33,9 @@ namespace Transformalize.Providers.FileHelpers {
         private readonly IRowFactory _rowFactory;
         private readonly Field _field;
         private readonly HashSet<int> _linesToKeep = new HashSet<int>();
+       private FileInfo _fileInfo;
 
-        public FileReader(InputContext context, IRowFactory rowFactory) {
+       public FileReader(InputContext context, IRowFactory rowFactory) {
             _context = context;
             _rowFactory = rowFactory;
             _field = context.Entity.GetAllFields().First(f => f.Input);
@@ -43,6 +44,8 @@ namespace Transformalize.Providers.FileHelpers {
                     _linesToKeep.Add(lineNo);
                 }
             }
+
+           _fileInfo = FileUtility.Find(context.Connection.File);
         }
 
         public static IEnumerable<string> ReadLines(string path, Encoding encoding) {
@@ -56,11 +59,12 @@ namespace Transformalize.Providers.FileHelpers {
         }
 
         public IEnumerable<IRow> Read() {
+           
             var encoding = Encoding.GetEncoding(_context.Connection.Encoding);
             var lineNo = 0;
-            if (Path.GetExtension(_context.Connection.File) == ".xml") {
+            if (_fileInfo.Extension == ".xml") {
                 var row = _rowFactory.Create();
-                row[_field] = File.ReadAllText(_context.Connection.File, encoding);
+                row[_field] = File.ReadAllText(_fileInfo.FullName, encoding);
                 yield return row;
             } else {
                 if (_context.Connection.LinePattern != string.Empty) {
@@ -68,7 +72,7 @@ namespace Transformalize.Providers.FileHelpers {
                     var regex = new Regex(_context.Connection.LinePattern, RegexOptions.Compiled);
                     var prevLine = string.Empty;
 
-                    foreach (var line in ReadLines(_context.Connection.File, encoding)) {
+                    foreach (var line in ReadLines(_fileInfo.FullName, encoding)) {
                         ++lineNo;
 
                         if (_linesToKeep.Contains(lineNo)) {
@@ -105,7 +109,7 @@ namespace Transformalize.Providers.FileHelpers {
                     }
 
                 } else {
-                    foreach (var line in System.IO.File.ReadLines(_context.Connection.File, encoding)) {
+                    foreach (var line in File.ReadLines(_fileInfo.FullName, encoding)) {
 
                         ++lineNo;
 
