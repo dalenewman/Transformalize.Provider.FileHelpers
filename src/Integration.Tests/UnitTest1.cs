@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using Autofac;
+﻿using Autofac;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 using Transformalize.Configuration;
 using Transformalize.Containers.Autofac;
 using Transformalize.Contracts;
@@ -9,12 +9,12 @@ using Transformalize.Providers.Bogus.Autofac;
 using Transformalize.Providers.Console;
 
 namespace Integration.Tests {
-    [TestClass]
-    public class UnitTest1 {
+   [TestClass]
+   public class UnitTest1 {
 
-        [TestMethod]
-        public void Write() {
-            const string xml = @"<add name='file' mode='init'>
+      [TestMethod]
+      public void Write() {
+         const string xml = @"<add name='file' mode='init'>
   <parameters>
     <add name='Size' type='int' value='1000' />
   </parameters>
@@ -34,20 +34,20 @@ namespace Integration.Tests {
     </add>
   </entities>
 </add>";
-            using (var outer = new ConfigurationContainer().CreateScope(xml)) {
-                using (var inner = new TestContainer(new BogusModule(), new FileHelpersModule()).CreateScope(outer, new ConsoleLogger(LogLevel.Debug))) {
-                    var process = inner.Resolve<Process>();
-                    var controller = inner.Resolve<IProcessController>();
-                    controller.Execute();
-
-                    Assert.AreEqual((uint)1000, process.Entities.First().Inserts);
-                }
+         var logger = new ConsoleLogger(LogLevel.Debug);
+         using (var outer = new ConfigurationContainer().CreateScope(xml, logger)) {
+            var process = outer.Resolve<Process>();
+            using (var inner = new Container(new BogusModule(), new FileHelpersModule()).CreateScope(process, logger)) {
+               var controller = inner.Resolve<IProcessController>();
+               controller.Execute();
+               Assert.AreEqual((uint)1000, process.Entities.First().Inserts);
             }
-        }
+         }
+      }
 
-        [TestMethod]
-        public void WriteWithSomeLineBreaks() {
-            const string xml = @"<add name='file' mode='init'>
+      [TestMethod]
+      public void WriteWithSomeLineBreaks() {
+         const string xml = @"<add name='file' mode='init'>
   <connections>
     <add name='input' provider='internal' />
     <add name='output' provider='file' delimiter=',' file='c:\temp\data-with-line-breaks-and-commas.csv' text-qualifier='""' />
@@ -69,19 +69,19 @@ namespace Integration.Tests {
     </add>
   </entities>
 </add>";
-            using (var outer = new ConfigurationContainer().CreateScope(xml)) {
-                using (var inner = new TestContainer(new BogusModule(), new FileHelpersModule()).CreateScope(outer, new ConsoleLogger(LogLevel.Debug))) {
-                    //var process = inner.Resolve<Process>();
-                    var controller = inner.Resolve<IProcessController>();
-                    controller.Execute();
-                    
-                }
+         var logger = new ConsoleLogger(LogLevel.Debug);
+         using (var outer = new ConfigurationContainer().CreateScope(xml, logger)) {
+            var process = outer.Resolve<Process>();
+            using (var inner = new Container(new BogusModule(), new FileHelpersModule()).CreateScope(process, new ConsoleLogger(LogLevel.Debug))) {
+               var controller = inner.Resolve<IProcessController>();
+               controller.Execute();
             }
-        }
+         }
+      }
 
-        [TestMethod]
-        public void ReadWithSomeLineBreaks() {
-            const string xml = @"<add name='file' mode='init'>
+      [TestMethod]
+      public void ReadWithSomeLineBreaks() {
+         const string xml = @"<add name='file' mode='init'>
   <connections>
     <add name='input' provider='file' delimiter=',' file='c:\temp\data-with-line-breaks-and-commas.csv' text-qualifier='""' />
     <add name='output' provider='internal' />  
@@ -98,20 +98,21 @@ namespace Integration.Tests {
     </add>
   </entities>
 </add>";
-            using (var outer = new ConfigurationContainer().CreateScope(xml)) {
-                using (var inner = new TestContainer(new BogusModule(), new FileHelpersModule()).CreateScope(outer, new ConsoleLogger(LogLevel.Debug))) {
-                    var process = inner.Resolve<Process>();
-                    var controller = inner.Resolve<IProcessController>();
-                    controller.Execute();
-                    Assert.AreEqual(2, process.Entities.First().Rows.Count);
+         var logger = new ConsoleLogger(LogLevel.Debug);
+         using (var outer = new ConfigurationContainer().CreateScope(xml, logger)) {
+            var process = outer.Resolve<Process>();
+            using (var inner = new Container(new BogusModule(), new FileHelpersModule()).CreateScope(process, logger)) {
+               var controller = inner.Resolve<IProcessController>();
+               controller.Execute();
+               Assert.AreEqual(2, process.Entities.First().Rows.Count);
 
-                }
             }
-        }
+         }
+      }
 
-        [TestMethod]
-        public void Read() {
-            const string xml = @"<add name='file'>
+      [TestMethod]
+      public void Read() {
+         const string xml = @"<add name='file'>
   <connections>
     <add name='input' provider='file' delimiter=',' file='c:\temp\bogus.csv' start='2' />
     <add name='output' provider='internal' />
@@ -128,24 +129,23 @@ namespace Integration.Tests {
     </add>
   </entities>
 </add>";
-            using (var outer = new ConfigurationContainer().CreateScope(xml)) {
-                using (var inner = new TestContainer(new FileHelpersModule()).CreateScope(outer, new ConsoleLogger(LogLevel.Debug))) {
+         var logger = new ConsoleLogger(LogLevel.Debug);
+         using (var outer = new ConfigurationContainer().CreateScope(xml, logger)) {
+            var process = outer.Resolve<Process>();
+            using (var inner = new Container(new FileHelpersModule()).CreateScope(process, logger)) {
+               var controller = inner.Resolve<IProcessController>();
+               controller.Execute();
+               var rows = process.Entities.First().Rows;
 
-                    var process = inner.Resolve<Process>();
+               Assert.AreEqual(10, rows.Count);
 
-                    var controller = inner.Resolve<IProcessController>();
-                    controller.Execute();
-                    var rows = process.Entities.First().Rows;
-
-                    Assert.AreEqual(10, rows.Count);
-
-                }
             }
-        }
+         }
+      }
 
-        [TestMethod]
-        public void ReadSchema() {
-            const string xml = @"<add name='file'>
+      [TestMethod]
+      public void ReadSchema() {
+         const string xml = @"<add name='file'>
   <connections>
     <add name='input' provider='file' file='c:\temp\bogus.csv'>
         <types>
@@ -160,26 +160,27 @@ namespace Integration.Tests {
     <add name='BogusStar' alias='Contact' />
   </entities>
 </add>";
-            using (var outer = new ConfigurationContainer().CreateScope(xml)) {
-                using (var inner = new TestContainer(new FileHelpersModule()).CreateScope(outer, new ConsoleLogger(LogLevel.Debug))) {
+         var logger = new ConsoleLogger(LogLevel.Debug);
+         using (var outer = new ConfigurationContainer().CreateScope(xml, logger)) {
+            var process = outer.Resolve<Process>();
 
-                    var process = inner.Resolve<Process>();
+            using (var inner = new Container(new FileHelpersModule()).CreateScope(process, logger)) {
 
-                    var schemaReader = inner.ResolveNamed<ISchemaReader>(process.Connections.First().Key);
-                    var schema = schemaReader.Read();
+               var schemaReader = inner.ResolveNamed<ISchemaReader>(process.Connections.First().Key);
+               var schema = schemaReader.Read();
 
-                    var entity = schema.Entities.First();
+               var entity = schema.Entities.First();
 
-                    Assert.AreEqual(5, entity.Fields.Count);
-                    Assert.AreEqual("int", entity.Fields[0].Type);
-                    Assert.AreEqual("string", entity.Fields[1].Type);
-                    Assert.AreEqual("string", entity.Fields[2].Type);
-                    Assert.AreEqual("byte", entity.Fields[3].Type);
-                    Assert.AreEqual("int", entity.Fields[4].Type);
+               Assert.AreEqual(5, entity.Fields.Count);
+               Assert.AreEqual("int", entity.Fields[0].Type);
+               Assert.AreEqual("string", entity.Fields[1].Type);
+               Assert.AreEqual("string", entity.Fields[2].Type);
+               Assert.AreEqual("byte", entity.Fields[3].Type);
+               Assert.AreEqual("int", entity.Fields[4].Type);
 
 
-                }
             }
-        }
-    }
+         }
+      }
+   }
 }

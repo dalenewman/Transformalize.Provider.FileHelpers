@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Transformalize.Provider.FileHelpers.Autofac</id>
-    <version>0.3.31-beta</version>
+    <version>0.5.0-beta</version>
     <title>File Provider for Transformalize Autofac Module</title>
     <authors>Dale Newman</authors>
     <owners>Dale Newman</owners>
@@ -15,7 +15,7 @@
     <dependencies>
       <group targetFramework="net462">
         <dependency id="Autofac" version="4.6.2" />
-        <dependency id="Transformalize.Provider.FileHelpers" version="0.3.31-beta" />
+        <dependency id="Transformalize.Provider.FileHelpers" version="0.5.0-beta" />
       </group>
     </dependencies>
   </metadata>

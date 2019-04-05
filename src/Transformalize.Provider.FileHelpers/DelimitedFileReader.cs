@@ -16,80 +16,29 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Transformalize.Context;
 using Transformalize.Contracts;
-using Transformalize.Extensions;
 
 namespace Transformalize.Providers.FileHelpers {
 
-    public class DelimitedFileReader : IRead {
+   public class DelimitedFileReader : IRead {
 
-        private readonly InputContext _context;
-        private readonly IRowFactory _rowFactory;
-        private readonly FileInfo _fileInfo;
+      private readonly InputContext _context;
+      private readonly IRowFactory _rowFactory;
 
-        public DelimitedFileReader(InputContext context, IRowFactory rowFactory) {
-            _context = context;
-            _rowFactory = rowFactory;
-            _fileInfo = FileUtility.Find(_context.Connection.File);
-        }
+      public DelimitedFileReader(InputContext context, IRowFactory rowFactory) {
+         _context = context;
+         _rowFactory = rowFactory;
+      }
 
-        public IEnumerable<IRow> Read() {
-            _context.Debug(() => $"Reading {_fileInfo.Name}.");
-
-            var start = _context.Connection.Start;
-            var end = 0;
-            if (_context.Entity.IsPageRequest()) {
-                start += (_context.Entity.Page * _context.Entity.Size) - _context.Entity.Size;
-                end = (start + _context.Entity.Size) - 1;
-            }
-
-            var engine = FileHelpersEngineFactory.Create(_context);
-
-            IDisposable reader;
-            try {
-                reader = engine.BeginReadFile(_fileInfo.FullName);
-            } catch (Exception ex) {
-                _context.Error(ex.Message);
-                yield break;
-            }
-
-            using (reader) {
-                foreach (var record in engine) {
-                    
-                    if (end == 0 || engine.LineNumber.Between(start, end)) {
-
-                        var values = engine.LastRecordValues;
-                        var row = _rowFactory.Create();
-                        for (var i = 0; i < _context.InputFields.Length; i++) {
-                            var field = _context.InputFields[i];
-                            row[field] = values[i];
-                        }
-
-                        yield return row;
-                    }
-
-                    if (engine.LineNumber == end) {
-                        break;
-                    }
-                }
-            }
-
-            if (engine.ErrorManager.HasErrors) {
-                foreach (var error in engine.ErrorManager.Errors) {
-                    _context.Error(error.ExceptionInfo.Message);
-                    _context.Error($"Error processing line {error.LineNumber} in {_context.Connection.File}.");
-                    _context.Warn(error.RecordString.Replace("{","{{").Replace("}","}}"));
-                }
-            }
-
-        }
-
-
-
-    }
+      public IEnumerable<IRow> Read() {
+         var fileInfo = FileUtility.Find(_context.Connection.File);
+         var encoding = Encoding.GetEncoding(_context.Connection.Encoding);
+         return new DelimitedFileStreamReader(_context, new StreamReader(new FileStream(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), encoding), _rowFactory).Read();
+      }
+   }
 }
 

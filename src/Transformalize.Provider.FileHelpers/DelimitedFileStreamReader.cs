@@ -18,68 +18,77 @@
 
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using Transformalize.Configuration;
 using Transformalize.Context;
 using Transformalize.Contracts;
 using Transformalize.Extensions;
+using Transformalize.Transforms;
 
 namespace Transformalize.Providers.FileHelpers {
 
-    public class DelimitedFileStreamReader : IRead {
+   public class DelimitedFileStreamReader : IRead {
 
-        private readonly InputContext _context;
-        private readonly Stream _stream;
-        private readonly IRowFactory _rowFactory;
+      private readonly InputContext _context;
+      private readonly IRowFactory _rowFactory;
+      private readonly List<ITransform> _transforms = new List<ITransform>();
+      private readonly StreamReader _streamReader;
 
-        public DelimitedFileStreamReader(InputContext context, Stream stream, IRowFactory rowFactory) {
-            _context = context;
-            _stream = stream;
-            _rowFactory = rowFactory;
-        }
+      public DelimitedFileStreamReader(InputContext context, StreamReader streamReader, IRowFactory rowFactory) {
+         _context = context;
+         _streamReader = streamReader;
+         _rowFactory = rowFactory;
 
-        public IEnumerable<IRow> Read() {
+         foreach (var field in context.Entity.Fields.Where(f => f.Input && f.Type != "string" && (!f.Transforms.Any() || f.Transforms.First().Method != "convert"))) {
+            _transforms.Add(new ConvertTransform(new PipelineContext(context.Logger, context.Process, context.Entity, field, new Operation { Method = "convert" })));
+         }
+      }
 
-            _context.Debug(() => "Reading file stream.");
+      public IEnumerable<IRow> Read() {
+         return _transforms.Aggregate(PreRead(), (rows, transform) => transform.Operate(rows));
+      }
 
-            var start = _context.Connection.Start;
-            var end = 0;
-            if (_context.Entity.IsPageRequest()) {
-                start += (_context.Entity.Page * _context.Entity.Size) - _context.Entity.Size;
-                end = start + _context.Entity.Size;
+      private IEnumerable<IRow> PreRead() {
+
+         _context.Debug(() => "Reading file stream.");
+
+         var start = _context.Connection.Start;
+         var end = 0;
+         if (_context.Entity.IsPageRequest()) {
+            start += (_context.Entity.Page * _context.Entity.Size) - _context.Entity.Size;
+            end = start + _context.Entity.Size;
+         }
+
+         var current = _context.Connection.Start;
+
+         var engine = FileHelpersEngineFactory.Create(_context);
+
+         using (engine.BeginReadStream(_streamReader)) {
+            foreach (var record in engine) {
+               if (end == 0 || current.Between(start, end)) {
+                  var values = engine.LastRecordValues;
+                  var row = _rowFactory.Create();
+                  for (var i = 0; i < _context.InputFields.Length; i++) {
+                     row[_context.InputFields[i]] = values[i];
+                  }
+                  yield return row;
+               }
+               ++current;
+               if (current == end) {
+                  break;
+               }
             }
+         }
 
-            var current = _context.Connection.Start;
+         _streamReader.Close();
 
-            var engine = FileHelpersEngineFactory.Create(_context);
-
-            using (engine.BeginReadStream(new StreamReader(_stream))) {
-                foreach (var record in engine) {
-                    if (end == 0 || current.Between(start, end)) {
-                        var values = engine.LastRecordValues;
-                        var row = _rowFactory.Create();
-                        for (var i = 0; i < _context.InputFields.Length; i++) {
-                            var field = _context.InputFields[i];
-                            if (field.Type == "string") {
-                                row[field] = values[i] as string;
-                            } else {
-                                row[field] = field.Convert(values[i]);
-                            }
-                        }
-                        yield return row;
-                    }
-                    ++current;
-                    if (current == end) {
-                        break;
-                    }
-                }
+         if (engine.ErrorManager.HasErrors) {
+            foreach (var error in engine.ErrorManager.Errors) {
+               _context.Error(error.ExceptionInfo.Message);
             }
+         }
 
-            if (engine.ErrorManager.HasErrors) {
-                foreach (var error in engine.ErrorManager.Errors) {
-                    _context.Error(error.ExceptionInfo.Message);
-                }
-            }
-
-        }
-    }
+      }
+   }
 }
 
