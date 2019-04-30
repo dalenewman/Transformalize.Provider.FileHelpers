@@ -27,36 +27,41 @@ using Transformalize.Impl;
 using Transformalize.Providers.FileHelpers;
 
 namespace Transformalize.Provider.FileHelpers.Autofac {
-    public class FolderReader : IRead {
+   public class FolderReader : IRead {
 
-        private readonly IRead _reader;
-        public FolderReader(IConnectionContext input, IRowFactory rowFactory) {
+      private readonly IRead _reader;
+      public FolderReader(IConnectionContext input, IRowFactory rowFactory) {
 
-            var readers = new List<IRead>();
-            var searchOption = (SearchOption)Enum.Parse(typeof(SearchOption), input.Connection.SearchOption, true);
+         var readers = new List<IRead>();
+         var searchOption = (SearchOption)Enum.Parse(typeof(SearchOption), input.Connection.SearchOption, true);
 
-            input.Info($"Searching folder: {input.Connection.Folder}");
-            var files = new DirectoryInfo(input.Connection.Folder).GetFiles(input.Connection.SearchPattern, searchOption).OrderBy(f => f.CreationTime).ToArray();
+         input.Info($"Searching folder: {input.Connection.Folder}");
+         var files = new DirectoryInfo(input.Connection.Folder).GetFiles(input.Connection.SearchPattern, searchOption).OrderBy(f => f.CreationTime).ToArray();
 
-            input.Info($"Found {files.Length} files.");
-            foreach (var file in files) {
-                input.Info($"Found file: {file.Name}");
-                input.Connection.File = file.FullName;
-                var context = new PipelineContext(input.Logger, input.Process, input.Entity, input.Field, input.Operation);
+         input.Info($"Found {files.Length} files.");
+         foreach (var file in files) {
+            input.Info($"Found file: {file.Name}");
+            input.Connection.File = file.FullName;
+            var context = new PipelineContext(input.Logger, input.Process, input.Entity, input.Field, input.Operation);
 
-                var fileConnection = input.Connection.Clone();
-                fileConnection.Provider = "file";
-                fileConnection.File = file.FullName;
+            var fileConnection = input.Connection.Clone();
+            fileConnection.Provider = "file";
+            fileConnection.File = file.FullName;
 
-                var fileInput = new InputContext(context) { Connection = fileConnection };
+            var fileInput = new InputContext(context) { Connection = fileConnection };
 
-                readers.Add(new DelimitedFileReader(fileInput, rowFactory));
+            if (input.Connection.Delimiter == string.Empty && input.Entity.Fields.Count(f => f.Input) == 1) {
+               readers.Add(new FileReader(fileInput, rowFactory));
+            } else {
+               readers.Add(new DelimitedFileReader(fileInput, rowFactory));
             }
-            _reader = new CompositeReader(readers);
-        }
 
-        public IEnumerable<IRow> Read() {
-            return _reader.Read();
-        }
-    }
+         }
+         _reader = new CompositeReader(readers);
+      }
+
+      public IEnumerable<IRow> Read() {
+         return _reader.Read();
+      }
+   }
 }

@@ -27,107 +27,105 @@ using Transformalize.Contracts;
 
 namespace Transformalize.Providers.FileHelpers {
 
-    public class FileReader : IRead {
+   public class FileReader : IRead {
 
-        private readonly InputContext _context;
-        private readonly IRowFactory _rowFactory;
-        private readonly Field _field;
-        private readonly HashSet<int> _linesToKeep = new HashSet<int>();
-       private FileInfo _fileInfo;
+      private readonly InputContext _context;
+      private readonly IRowFactory _rowFactory;
+      private readonly Field _field;
+      private readonly HashSet<int> _linesToKeep = new HashSet<int>();
+      private FileInfo _fileInfo;
 
-       public FileReader(InputContext context, IRowFactory rowFactory) {
-            _context = context;
-            _rowFactory = rowFactory;
-            _field = context.Entity.GetAllFields().First(f => f.Input);
-            foreach (var transform in context.Entity.GetAllTransforms().Where(t => t.Method == "line")) {
-                if (int.TryParse(transform.Value, out var lineNo)) {
-                    _linesToKeep.Add(lineNo);
-                }
+      public FileReader(InputContext context, IRowFactory rowFactory) {
+         _context = context;
+         _rowFactory = rowFactory;
+         _field = context.Entity.GetAllFields().First(f => f.Input);
+         foreach (var transform in context.Entity.GetAllTransforms().Where(t => t.Method == "line")) {
+            if (int.TryParse(transform.Value, out var lineNo)) {
+               _linesToKeep.Add(lineNo);
             }
+         }
 
-           _fileInfo = FileUtility.Find(context.Connection.File);
-        }
+         _fileInfo = FileUtility.Find(context.Connection.File);
+      }
 
-        public static IEnumerable<string> ReadLines(string path, Encoding encoding) {
-            using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 0x1000, FileOptions.SequentialScan))
-            using (var sr = new StreamReader(fs, encoding)) {
-                string line;
-                while ((line = sr.ReadLine()) != null) {
-                    yield return line;
-                }
+      public static IEnumerable<string> ReadLines(string path, Encoding encoding) {
+         using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 0x1000, FileOptions.SequentialScan))
+         using (var sr = new StreamReader(fs, encoding)) {
+            string line;
+            while ((line = sr.ReadLine()) != null) {
+               yield return line;
             }
-        }
+         }
+      }
 
-        public IEnumerable<IRow> Read() {
-           
-            var encoding = Encoding.GetEncoding(_context.Connection.Encoding);
-            var lineNo = 0;
-            if (_fileInfo.Extension == ".xml") {
-                var row = _rowFactory.Create();
-                row[_field] = File.ReadAllText(_fileInfo.FullName, encoding);
-                yield return row;
+      public IEnumerable<IRow> Read() {
+
+         var encoding = Encoding.GetEncoding(_context.Connection.Encoding);
+         var lineNo = 0;
+         if (_fileInfo.Extension == ".xml") {
+            var row = _rowFactory.Create();
+            row[_field] = File.ReadAllText(_fileInfo.FullName, encoding);
+            yield return row;
+         } else {
+            if (_context.Connection.LinePattern != string.Empty) {
+
+               var regex = new Regex(_context.Connection.LinePattern, RegexOptions.Compiled);
+               var prevLine = string.Empty;
+
+               foreach (var line in ReadLines(_fileInfo.FullName, encoding)) {
+                  ++lineNo;
+
+                  if (_linesToKeep.Contains(lineNo)) {
+                     _context.Connection.Lines[lineNo] = line;
+                  }
+
+                  if (lineNo < _context.Connection.Start) continue;
+
+                  if (regex.IsMatch(line)) {
+                     if (regex.IsMatch(prevLine)) {
+                        var row = _rowFactory.Create();
+                        row[_field] = string.Copy(prevLine);
+                        prevLine = line;
+                        yield return row;
+                     } else {
+                        prevLine = line;
+                     }
+                  } else {
+                     if (regex.IsMatch(prevLine)) {
+                        var row = _rowFactory.Create();
+                        row[_field] = string.Copy(prevLine);
+                        prevLine = line;
+                        yield return row;
+                     } else {
+                        prevLine = prevLine + " " + line;
+                     }
+                  }
+               }
+
+               if (regex.IsMatch(prevLine)) {
+                  var row = _rowFactory.Create();
+                  row[_field] = prevLine;
+                  yield return row;
+               }
+
             } else {
-                if (_context.Connection.LinePattern != string.Empty) {
+               foreach (var line in File.ReadLines(_fileInfo.FullName, encoding)) {
 
-                    var regex = new Regex(_context.Connection.LinePattern, RegexOptions.Compiled);
-                    var prevLine = string.Empty;
+                  ++lineNo;
 
-                    foreach (var line in ReadLines(_fileInfo.FullName, encoding)) {
-                        ++lineNo;
+                  if (_linesToKeep.Contains(lineNo)) {
+                     _context.Connection.Lines[lineNo] = line;
+                  }
 
-                        if (_linesToKeep.Contains(lineNo)) {
-                            _context.Connection.Lines[lineNo] = line;
-                        }
+                  if (lineNo < _context.Connection.Start) continue;
 
-                        if (lineNo < _context.Connection.Start) continue;
+                  var row = _rowFactory.Create();
+                  row[_field] = line;
+                  yield return row;
 
-                        if (regex.IsMatch(line)) {
-                            if (regex.IsMatch(prevLine)) {
-                                var row = _rowFactory.Create();
-                                row[_field] = string.Copy(prevLine);
-                                prevLine = line;
-                                yield return row;
-                            } else {
-                                prevLine = line;
-                            }
-                        } else {
-                            if (regex.IsMatch(prevLine)) {
-                                var row = _rowFactory.Create();
-                                row[_field] = string.Copy(prevLine);
-                                prevLine = line;
-                                yield return row;
-                            } else {
-                                prevLine = prevLine + " " + line;
-                            }
-                        }
-                    }
-
-                    if (regex.IsMatch(prevLine)) {
-                        var row = _rowFactory.Create();
-                        row[_field] = prevLine;
-                        yield return row;
-                    }
-
-                } else {
-                    foreach (var line in File.ReadLines(_fileInfo.FullName, encoding)) {
-
-                        ++lineNo;
-
-                        if (_linesToKeep.Contains(lineNo)) {
-                            _context.Connection.Lines[lineNo] = line;
-                        }
-
-                        if (lineNo < _context.Connection.Start) continue;
-
-                        var row = _rowFactory.Create();
-                        row[_field] = line;
-                        yield return row;
-
-                    }
-                }
-
-
+               }
             }
-        }
-    }
+         }
+      }
+   }
 }

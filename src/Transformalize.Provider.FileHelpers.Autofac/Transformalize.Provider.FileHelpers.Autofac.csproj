@@ -49,8 +49,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Transformalize, Version=0.5.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Transformalize.0.5.0-beta\lib\net462\Transformalize.dll</HintPath>
+    <Reference Include="Transformalize, Version=0.6.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Transformalize.0.6.1-beta\lib\net462\Transformalize.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
