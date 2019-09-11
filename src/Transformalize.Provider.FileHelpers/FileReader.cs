@@ -109,7 +109,7 @@ namespace Transformalize.Providers.FileHelpers {
                }
 
             } else {
-               foreach (var line in File.ReadLines(_fileInfo.FullName, encoding)) {
+               foreach (var line in ReadLines(_fileInfo.FullName, encoding)) {
 
                   ++lineNo;
 

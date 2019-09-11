@@ -23,97 +23,97 @@ using FileHelpers.Dynamic;
 using Transformalize.Context;
 
 namespace Transformalize.Providers.FileHelpers {
-    public static class FileHelpersEngineFactory {
+   public static class FileHelpersEngineFactory {
 
-        public static FileHelperAsyncEngine Create(OutputContext context) {
+      public static FileHelperAsyncEngine Create(OutputContext context) {
 
-            var delimiter = string.IsNullOrEmpty(context.Connection.Delimiter) ? "," : context.Connection.Delimiter;
+         var delimiter = string.IsNullOrEmpty(context.Connection.Delimiter) ? "," : context.Connection.Delimiter;
 
-            var builder = new DelimitedClassBuilder(Utility.Identifier(context.Entity.OutputTableName(context.Process.Name))) {
-                IgnoreEmptyLines = true,
-                Delimiter = delimiter,
-                IgnoreFirstLines = 0
+         var builder = new DelimitedClassBuilder(Utility.Identifier(context.Entity.OutputTableName(context.Process.Name))) {
+            IgnoreEmptyLines = true,
+            Delimiter = delimiter,
+            IgnoreFirstLines = 0
+         };
+
+         var fields = context.Entity.GetAllOutputFields().Where(f => !f.System).ToArray();
+
+         if (context.Connection.TextQualifier == string.Empty) {
+            foreach (var field in fields) {
+               var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
+               fieldBuilder.FieldQuoted = false;
+               fieldBuilder.QuoteMultiline = MultilineMode.NotAllow;
+               fieldBuilder.FieldOptional = field.Optional;
+            }
+         } else {
+            foreach (var field in fields) {
+               var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
+               fieldBuilder.FieldQuoted = true;
+               fieldBuilder.QuoteChar = context.Connection.TextQualifier[0];
+               fieldBuilder.QuoteMultiline = MultilineMode.AllowForBoth;
+               fieldBuilder.QuoteMode = QuoteMode.OptionalForBoth;
+               fieldBuilder.FieldOptional = field.Optional;
+            }
+         }
+
+         Enum.TryParse(context.Connection.ErrorMode, true, out global::FileHelpers.ErrorMode errorMode);
+
+         FileHelperAsyncEngine engine;
+
+         if (context.Connection.Header == Constants.DefaultSetting) {
+            var headerText = string.Join(delimiter, fields.Select(f => f.Label.Replace(delimiter, " ")));
+            engine = new FileHelperAsyncEngine(builder.CreateRecordClass()) {
+               ErrorMode = errorMode,
+               HeaderText = headerText,
+               FooterText = context.Connection.Footer
             };
-
-            var fields = context.Entity.GetAllOutputFields().Where(f => !f.System).ToArray();
-
-            if (context.Connection.TextQualifier == string.Empty) {
-                foreach (var field in fields) {
-                    var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
-                    fieldBuilder.FieldQuoted = false;
-                    fieldBuilder.QuoteMultiline = MultilineMode.NotAllow;
-                    fieldBuilder.FieldOptional = field.Optional;
-                }
-            } else {
-                foreach (var field in fields) {
-                    var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
-                    fieldBuilder.FieldQuoted = true;
-                    fieldBuilder.QuoteChar = context.Connection.TextQualifier[0];
-                    fieldBuilder.QuoteMultiline = MultilineMode.AllowForBoth;
-                    fieldBuilder.QuoteMode = QuoteMode.OptionalForBoth;
-                    fieldBuilder.FieldOptional = field.Optional;
-                }
+         } else {
+            engine = new FileHelperAsyncEngine(builder.CreateRecordClass()) { ErrorMode = errorMode };
+            if (context.Connection.Header != string.Empty) {
+               engine.HeaderText = context.Connection.Header;
             }
-
-            Enum.TryParse(context.Connection.ErrorMode, true, out global::FileHelpers.ErrorMode errorMode);
-
-            FileHelperAsyncEngine engine;
-
-            if (context.Connection.Header == Constants.DefaultSetting) {
-                var headerText = string.Join(delimiter, fields.Select(f => f.Label.Replace(delimiter, " ")));
-                engine = new FileHelperAsyncEngine(builder.CreateRecordClass()) {
-                    ErrorMode = errorMode,
-                    HeaderText = headerText,
-                    FooterText = context.Connection.Footer
-                };
-            } else {
-                engine = new FileHelperAsyncEngine(builder.CreateRecordClass()) { ErrorMode = errorMode };
-                if (context.Connection.Header != string.Empty) {
-                    engine.HeaderText = context.Connection.Header;
-                }
-                if (context.Connection.Footer != string.Empty) {
-                    engine.FooterText = context.Connection.Footer;
-                }
+            if (context.Connection.Footer != string.Empty) {
+               engine.FooterText = context.Connection.Footer;
             }
+         }
 
-            return engine;
+         return engine;
 
-        }
+      }
 
-        public static FileHelperAsyncEngine Create(InputContext context) {
+      public static FileHelperAsyncEngine Create(InputContext context) {
 
-            var identifier = Utility.Identifier(context.Entity.OutputTableName(context.Process.Name));
-            var delimiter = string.IsNullOrEmpty(context.Connection.Delimiter) ? "," : context.Connection.Delimiter;
+         var identifier = Utility.Identifier(context.Entity.OutputTableName(context.Process.Name));
+         var delimiter = string.IsNullOrEmpty(context.Connection.Delimiter) ? "," : context.Connection.Delimiter;
 
-            var builder = new DelimitedClassBuilder(identifier) {
-                IgnoreEmptyLines = true,
-                Delimiter = delimiter,
-                IgnoreFirstLines = context.Connection.Start > 1 ? context.Connection.Start -1 : context.Connection.Start
-            };
+         var builder = new DelimitedClassBuilder(identifier) {
+            IgnoreEmptyLines = true,
+            Delimiter = delimiter,
+            IgnoreFirstLines = context.Connection.Start > 1 ? context.Connection.Start - 1 : context.Connection.Start
+         };
 
-            if (context.Connection.TextQualifier == string.Empty) {
-                foreach (var field in context.InputFields) {
-                    var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
-                    fieldBuilder.FieldQuoted = false;
-                    fieldBuilder.FieldOptional = field.Optional;
-                }
-            } else {
-                foreach (var field in context.InputFields) {
-                    var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
-                    fieldBuilder.FieldQuoted = true;
-                    fieldBuilder.QuoteChar = context.Connection.TextQualifier[0];
-                    fieldBuilder.QuoteMode = QuoteMode.OptionalForBoth;
-                    fieldBuilder.FieldOptional = field.Optional;
-                }
+         if (context.Connection.TextQualifier == string.Empty) {
+            foreach (var field in context.InputFields) {
+               var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
+               fieldBuilder.FieldQuoted = false;
+               fieldBuilder.FieldOptional = field.Optional;
             }
+         } else {
+            foreach (var field in context.InputFields) {
+               var fieldBuilder = builder.AddField(field.FieldName(), typeof(string));
+               fieldBuilder.FieldQuoted = true;
+               fieldBuilder.QuoteChar = context.Connection.TextQualifier[0];
+               fieldBuilder.QuoteMode = QuoteMode.OptionalForBoth;
+               fieldBuilder.FieldOptional = field.Optional;
+            }
+         }
 
-            Enum.TryParse(context.Connection.ErrorMode, true, out global::FileHelpers.ErrorMode errorMode);
+         Enum.TryParse(context.Connection.ErrorMode, true, out global::FileHelpers.ErrorMode errorMode);
 
-            var engine = new FileHelperAsyncEngine(builder.CreateRecordClass());
-            engine.ErrorManager.ErrorMode = errorMode;
-            engine.ErrorManager.ErrorLimit = context.Connection.ErrorLimit;
+         var engine = new FileHelperAsyncEngine(builder.CreateRecordClass());
+         engine.ErrorManager.ErrorMode = errorMode;
+         engine.ErrorManager.ErrorLimit = context.Connection.ErrorLimit;
 
-            return engine;
-        }
-    }
+         return engine;
+      }
+   }
 }
