@@ -1,0 +1,10 @@
+﻿2019-06-16 08:14:06,477 [13] INFO  log - Record 3092: Added order 4727817
+2019-06-16 08:14:06,682 [13] INFO  log - Record 3093: Added order 6933046
+2019-06-16 08:14:06,697 [13] ERROR log - Stopped processing file \\sbsan2\projects\10-HONE03-1000\ETL\FromHost\4000\fromhost-endpoint-electric-4000-20190616120814.txt : Unexpected error
+System.Net.WebException: The request failed with HTTP status 400: Bad Request.
+   at System.Web.Services.Protocols.SoapHttpClientProtocol.ReadResponse(SoapClientMessage message, WebResponse response, Stream responseStream, Boolean asyncCall)
+   at System.Web.Services.Protocols.SoapHttpClientProtocol.Invoke(String methodName, Object[] parameters)
+   at Clevest.HostExchange.Engine.Ws.HostService.FromHost(XmlNode xmlNode, String sessionId)
+   at Clevest.HostExchange.Engine.Runner.SendMFFRequest(XmlNode node, String filename, Int32 idx, Boolean& abortFlag, Boolean& configError, ResultSummary summary)
+2019-06-16 08:14:06,955 [13] WARN  log - FromHost file \\sbsan2\projects\10-HONE03-1000\ETL\FromHost\4000\fromhost-endpoint-electric-4000-20190616120814.txt processed, see fromhost-endpoint-electric-4000-20190616120814.txt-20190616120844.REJECT for rejected records
+2019-06-16 08:14:06,956 [13] INFO  log - Moved to \\sbsan2\projects\10-HONE03-1000\ETL\FromHost\4000\save\fromhost-endpoint-electric-4000-20190616120814-20190616121406.txt

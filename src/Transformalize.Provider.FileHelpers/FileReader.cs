@@ -33,7 +33,7 @@ namespace Transformalize.Providers.FileHelpers {
       private readonly IRowFactory _rowFactory;
       private readonly Field _field;
       private readonly HashSet<int> _linesToKeep = new HashSet<int>();
-      private FileInfo _fileInfo;
+      private readonly FileInfo _fileInfo;
 
       public FileReader(InputContext context, IRowFactory rowFactory) {
          _context = context;
@@ -81,24 +81,35 @@ namespace Transformalize.Providers.FileHelpers {
 
                   if (lineNo < _context.Connection.Start) continue;
 
-                  if (regex.IsMatch(line)) {
-                     if (regex.IsMatch(prevLine)) {
+                  if (regex.IsMatch(line)) { // CURRENT LINE PASSES
+
+                     if (regex.IsMatch(prevLine)) {  // PREVIOUS LINE PASSES
                         var row = _rowFactory.Create();
                         row[_field] = string.Copy(prevLine);
                         prevLine = line;
                         yield return row;
-                     } else {
+                     } else { // PREVIOUS LINE FAILS
                         prevLine = line;
                      }
-                  } else {
+
+                  } else { // CURRENT LINE FAILS 
+                     var combined = prevLine + " " + line;
+
                      if (regex.IsMatch(prevLine)) {
-                        var row = _rowFactory.Create();
-                        row[_field] = string.Copy(prevLine);
-                        prevLine = line;
-                        yield return row;
+
+                        if (regex.IsMatch(combined)) { // IF COMBINED THEY STILL PASS, COMBINE AND CONTINUE
+                           prevLine = combined;
+                        } else { // IF COMBINED THEY FAIL, LET THE VALID PREVIOUS LINE THROUGH AND PUT LINE IN PREV LINE IN HOPES SUBSEQUENT LINES WILL MAKE IT PASS
+                           var row = _rowFactory.Create();
+                           row[_field] = string.Copy(prevLine);
+                           prevLine = line;
+                           yield return row;
+                        }
+                        
                      } else {
-                        prevLine = prevLine + " " + line;
+                        prevLine = combined;
                      }
+
                   }
                }
 

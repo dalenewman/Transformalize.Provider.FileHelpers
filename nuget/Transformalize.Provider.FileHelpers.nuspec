@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Transformalize.Provider.FileHelpers</id>
-    <version>0.6.15-beta</version>
+    <version>0.6.16-beta</version>
     <title>File Provider for Transformalize</title>
     <authors>Dale Newman</authors>
     <owners>Dale Newman</owners>
