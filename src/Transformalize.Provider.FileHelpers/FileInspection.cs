@@ -103,7 +103,7 @@ namespace Transformalize.Providers.FileHelpers {
                 });
             }
 
-            process.Check();
+            process.Load();
 
             foreach (var warning in process.Warnings()) {
                 _context.Warn(warning);
