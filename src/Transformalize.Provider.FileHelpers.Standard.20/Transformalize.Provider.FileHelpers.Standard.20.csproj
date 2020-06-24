@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Transformalize.Provider.FileHelpers.Standard._20</RootNamespace>
+    <AssemblyName>Transformalize.Provider.FileHelpers</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FileHelpers" Version="3.4.1" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Transformalize" Version="0.6.29-beta" />
+  </ItemGroup>
+
+  <Import Project="..\Transformalize.Provider.FileHelpers.Shared\Transformalize.Provider.FileHelpers.Shared.projitems" Label="Shared" />
+
+</Project>

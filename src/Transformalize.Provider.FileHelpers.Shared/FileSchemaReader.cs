@@ -110,7 +110,7 @@ namespace Transformalize.Providers.FileHelpers {
             newEntity.Fields = newFields;
 
             return new Schema {
-                Connection = _process.Connections.FirstOrDefault(c => c.Name == entity.Input),
+                Connection = _process.Connections.FirstOrDefault(c => c.Name == entity.Connection),
                 Entities = new List<Entity> { newEntity }
             };
         }

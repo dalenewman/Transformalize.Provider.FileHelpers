@@ -65,7 +65,7 @@ namespace Transformalize.Provider.FileHelpers.Autofac {
          }
 
          // entity input
-         foreach (var entity in p.Entities.Where(e => p.Connections.First(c => c.Name == e.Connection).Provider == "file")) {
+         foreach (var entity in p.Entities.Where(e => p.Connections.First(c => c.Name == e.Input).Provider == "file")) {
 
             // input version detector
             builder.RegisterType<NullInputProvider>().Named<IInputProvider>(entity.Key);
@@ -84,7 +84,7 @@ namespace Transformalize.Provider.FileHelpers.Autofac {
          }
 
          // Entity Output
-         if (p.Output().Provider == "file") {
+         if (p.GetOutputConnection().Provider == "file") {
 
             // PROCESS OUTPUT CONTROLLER
             builder.Register<IOutputController>(ctx => new NullOutputController()).As<IOutputController>();
@@ -126,7 +126,7 @@ namespace Transformalize.Provider.FileHelpers.Autofac {
          }
 
          // enitity input
-         foreach (var entity in p.Entities.Where(e => p.Connections.First(c => c.Name == e.Connection).Provider == "folder")) {
+         foreach (var entity in p.Entities.Where(e => p.Connections.First(c => c.Name == e.Input).Provider == "folder")) {
 
             // input version detector
             builder.RegisterType<NullInputProvider>().Named<IInputProvider>(entity.Key);
@@ -144,7 +144,7 @@ namespace Transformalize.Provider.FileHelpers.Autofac {
             }).Named<IRead>(entity.Key);
          }
 
-         if (p.Output().Provider == "folder") {
+         if (p.GetOutputConnection().Provider == "folder") {
             // PROCESS OUTPUT CONTROLLER
             builder.Register<IOutputController>(ctx => new NullOutputController()).As<IOutputController>();
 
