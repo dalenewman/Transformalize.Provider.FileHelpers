@@ -34,6 +34,15 @@
     <Reference Include="Autofac, Version=4.9.4.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Autofac.4.9.4\lib\net45\Autofac.dll</HintPath>
     </Reference>
+    <Reference Include="Cfg.Net.Environment, Version=0.13.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Cfg-NET.Environment.0.13.2-beta\lib\netstandard2.0\Cfg.Net.Environment.dll</HintPath>
+    </Reference>
+    <Reference Include="Cfg.Net.Reader, Version=0.12.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Cfg-NET.Reader.0.13.2-beta\lib\net45\Cfg.Net.Reader.dll</HintPath>
+    </Reference>
+    <Reference Include="Cfg.Net.Shorthand, Version=0.13.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Cfg-NET.Shorthand.0.13.2-beta\lib\netstandard2.0\Cfg.Net.Shorthand.dll</HintPath>
+    </Reference>
     <Reference Include="CfgNet, Version=0.13.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Cfg-NET.0.13.2-beta\lib\net462\CfgNet.dll</HintPath>
     </Reference>
@@ -52,8 +61,11 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Transformalize, Version=0.8.12.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Transformalize.0.8.13-beta\lib\net462\Transformalize.dll</HintPath>
+    <Reference Include="Transformalize, Version=0.8.22.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Transformalize.0.8.22-beta\lib\net462\Transformalize.dll</HintPath>
+    </Reference>
+    <Reference Include="Transformalize.Container.Autofac, Version=0.8.23.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Transformalize.Container.Autofac.0.8.23-beta\lib\net462\Transformalize.Container.Autofac.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

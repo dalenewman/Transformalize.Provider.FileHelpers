@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2046
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Transformalize.Provider.FileHelpers", "src\Transformalize.Provider.FileHelpers\Transformalize.Provider.FileHelpers.csproj", "{2918B711-4BBF-4F5F-A7E8-21936AE11C76}"
 EndProject
@@ -11,6 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integration.Tests", "src\In
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{CB2C5EFE-3F36-43E8-A7AB-D2EBC9356389}"
 	ProjectSection(SolutionItems) = preProject
+		nuget\myget.bat = nuget\myget.bat
 		nuget\nuget.bat = nuget\nuget.bat
 		nuget\Transformalize.Provider.FileHelpers.Autofac.nuspec = nuget\Transformalize.Provider.FileHelpers.Autofac.nuspec
 		nuget\Transformalize.Provider.FileHelpers.nuspec = nuget\Transformalize.Provider.FileHelpers.nuspec

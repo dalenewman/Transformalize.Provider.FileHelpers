@@ -76,20 +76,20 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Transformalize, Version=0.8.12.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Transformalize.0.8.13-beta\lib\net462\Transformalize.dll</HintPath>
+    <Reference Include="Transformalize, Version=0.8.22.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Transformalize.0.8.22-beta\lib\net462\Transformalize.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Container.Autofac, Version=0.8.11.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Transformalize.Container.Autofac.0.8.11-beta\lib\net462\Transformalize.Container.Autofac.dll</HintPath>
+    <Reference Include="Transformalize.Container.Autofac, Version=0.8.23.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Transformalize.Container.Autofac.0.8.23-beta\lib\net462\Transformalize.Container.Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.Bogus, Version=0.8.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Transformalize.Provider.Bogus.0.8.1-beta\lib\net462\Transformalize.Provider.Bogus.dll</HintPath>
+    <Reference Include="Transformalize.Provider.Bogus, Version=0.8.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Transformalize.Provider.Bogus.0.8.22-beta\lib\net462\Transformalize.Provider.Bogus.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.Bogus.Autofac, Version=0.8.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Transformalize.Provider.Bogus.Autofac.0.8.1-beta\lib\net462\Transformalize.Provider.Bogus.Autofac.dll</HintPath>
+    <Reference Include="Transformalize.Provider.Bogus.Autofac, Version=0.8.21.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Transformalize.Provider.Bogus.Autofac.0.8.22-beta\lib\net462\Transformalize.Provider.Bogus.Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Transformalize.Provider.Console, Version=0.8.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Transformalize.Provider.Console.0.8.2-beta\lib\net462\Transformalize.Provider.Console.dll</HintPath>
+    <Reference Include="Transformalize.Provider.Console, Version=0.8.22.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Transformalize.Provider.Console.0.8.22-beta\lib\net462\Transformalize.Provider.Console.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
